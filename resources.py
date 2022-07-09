@@ -2,6 +2,7 @@ from flask_restful import Resource, Api, fields, marshal, reqparse
 from models import db
 from models import Todo
 
+from decorators import token_required
 
 parser = reqparse.RequestParser()
 parser.add_argument('title', type=str, required=True, location='json')
@@ -19,10 +20,12 @@ class TodoResource(Resource):
     """
     Todo resource
     """
+    @token_required
     def get(self):
         todos = Todo.query.all()
         return [marshal(todo, todo_fields) for todo in todos]
     
+    @token_required
     def post(self):
         args = parser.parse_args()
         new_todo = Todo(**args)
@@ -32,10 +35,15 @@ class TodoResource(Resource):
 
 
 class TodoDetailResource(Resource):
+    """
+    Todo detail resource
+    """
+    @token_required
     def get(self, id):
         todo = Todo.query.get_or_404(id, description='Todo not found')
         return marshal(todo, todo_fields)
     
+    @token_required
     def put(self, id):
         todo = Todo.query.get_or_404(id, description='Todo not found')
         args = parser.parse_args()
@@ -45,6 +53,7 @@ class TodoDetailResource(Resource):
         db.session.commit()
         return 'Updated Todo'
     
+    @token_required
     def delete(self, id):
         todo = Todo.query.get_or_404(id, description='Todo not found')
         db.session.delete(todo)
