@@ -1,6 +1,10 @@
+from crypt import methods
+import datetime
+import json
 import uuid
-from flask import Blueprint, jsonify, request
-from werkzeug.security import generate_password_hash
+from flask import Blueprint, current_app, jsonify, make_response, request
+import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from models import db, User
 
@@ -24,3 +28,21 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({'message': f'Registration successful with username "{username}"'})
+
+
+@auth_user.route('/api/auth/login', methods=['POST'])
+def login():
+    auth = request.authorization
+    if not auth or not auth.username or not auth.password:
+        return make_response('Could not verify', 401, {'Authentication': 'Login required'})
+    
+    user = User.query.filter_by(username=auth.username).first()
+    if check_password_hash(user.password_hashed, auth.password):
+        token = jwt.encode(payload={'public_id': user.public_id,
+                                    'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=45)},
+                           key=current_app.config['SECRET_KEY'],
+                           algorithm="HS256")
+        
+        return jsonify({'token': token})
+    
+    return make_response('Could not verify', 401, {'Authentication': 'Login required'})

@@ -17,10 +17,10 @@ def token_required(fn):
             return jsonify({'message': 'Missing token'})
         try:
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-            current_user = User.query.get(public_id=data['public_id'])
-        except:
+            current_user = User.query.filter_by(public_id=data['public_id']).first()
+        except Exception as e:
             return jsonify({'message': 'token not valid'})
         
-        return fn(current_user, *args, **kwargs)
+        return fn(*args, current_user, **kwargs)
     
     return decorator

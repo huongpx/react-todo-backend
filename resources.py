@@ -21,12 +21,12 @@ class TodoResource(Resource):
     Todo resource
     """
     @token_required
-    def get(self):
-        todos = Todo.query.all()
+    def get(self, current_user):
+        todos = Todo.query.filter_by(user_id=current_user.id).all()
         return [marshal(todo, todo_fields) for todo in todos]
     
     @token_required
-    def post(self):
+    def post(self, current_user):
         args = parser.parse_args()
         new_todo = Todo(**args)
         db.session.add(new_todo)
