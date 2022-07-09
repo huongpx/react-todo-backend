@@ -40,13 +40,17 @@ class TodoDetailResource(Resource):
     Todo detail resource
     """
     @token_required
-    def get(self, id):
-        todo = Todo.query.get_or_404(id, description='Todo not found')
+    def get(self, current_user, id):
+        todo = Todo.query.filter_by(id=id, user_id=current_user.id).first()
+        if not todo:
+            return 'Todo not found', 404
         return marshal(todo, todo_fields)
     
     @token_required
-    def put(self, id):
-        todo = Todo.query.get_or_404(id, description='Todo not found')
+    def put(self, current_user, id):
+        todo = Todo.query.filter_by(id=id, user_id=current_user.id).first()
+        if not todo:
+            return 'Todo not found', 404
         args = parser.parse_args()
         todo.title = args['title']
         todo.completed = args['completed']
@@ -55,8 +59,10 @@ class TodoDetailResource(Resource):
         return 'Updated Todo'
     
     @token_required
-    def delete(self, id):
-        todo = Todo.query.get_or_404(id, description='Todo not found')
+    def delete(self, current_user, id):
+        todo = Todo.query.filter_by(id=id, user_id=current_user.id).first()
+        if not todo:
+            return 'Todo not found', 404
         db.session.delete(todo)
         db.session.commit()
         return 'Deleted Todo'
