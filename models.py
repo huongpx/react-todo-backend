@@ -14,9 +14,10 @@ class Todo(db.Model):
     completed = db.Column(db.Boolean)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     
-    def __init__(self, title, completed):
+    def __init__(self, title, completed, user_id):
         self.title = title
         self.completed = completed
+        self.user_id = user_id
         
     def __repr__(self):
         return f'{self.title} - {self.completed}'

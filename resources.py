@@ -28,6 +28,7 @@ class TodoResource(Resource):
     @token_required
     def post(self, current_user):
         args = parser.parse_args()
+        args["user_id"] = current_user.id
         new_todo = Todo(**args)
         db.session.add(new_todo)
         db.session.commit()
