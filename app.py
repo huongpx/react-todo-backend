@@ -8,8 +8,8 @@ from resources import TodoResource, TodoDetailResource
 from auth import auth_user
 
 app = Flask(__name__)
-CORS(app)
 app.config.from_object('config')
+cors = CORS(app, supports_credentials=True)
 
 db.init_app(app)
 Migrate(app, db)
