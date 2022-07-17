@@ -32,7 +32,7 @@ class TodoResource(Resource):
         new_todo = Todo(**args)
         db.session.add(new_todo)
         db.session.commit()
-        return 'Create new Todo', 201
+        return marshal(new_todo, todo_fields)
 
 
 class TodoDetailResource(Resource):
@@ -56,7 +56,7 @@ class TodoDetailResource(Resource):
         todo.completed = args['completed']
         db.session.add(todo)
         db.session.commit()
-        return 'Updated Todo'
+        return marshal(todo, todo_fields)
     
     @token_required
     def delete(self, current_user, id):
