@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  api:
+    image: huongpx/react-todo-backend:v1
+    ports:
+      - 5000:5000
+    restart: unless-stopped
+  webapp:
+    image: huongpx/react-todo-frontend:v1
+    ports:
+      - 3000:80
+    restart: unless-stopped
